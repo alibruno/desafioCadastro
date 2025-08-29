@@ -38,7 +38,7 @@ O sistema deve ser implementado utilizando conceitos de Orientação a Objetos e
 
 O desafio será organizado em **PASSOS** em que você irá desenvolver novas funcionalidades para nossa aplicação CLI.
 
-Fique a vontade para criar e organizar entidades, serviços, utils e como desejar para este main!
+Fique a vontade para criar e organizar entidades, serviços, utils e como desejar para este projeto!
 
 Para iniciar, crie um Fork deste repositório e clone-o em sua máquina local, e também deixe sua ⭐ no repositório.
 
@@ -112,7 +112,7 @@ Agora, ao salvar o PET em um objeto, você deverá salvar as respostas em um arq
 ### _Regras ⚠️_
 
 1. O nome do arquivo deverá seguir o formato: ano, mês, dia,T, hora, minuto - NOME+SOBRENOME em maiúsculo.
-2. O arquivo deverá ser salvo na pasta `petsCadastrados` na raiz do main.
+2. O arquivo deverá ser salvo na pasta `petsCadastrados` na raiz do projeto.
 3. O conteúdo do arquivo deverá conter TODAS AS RESPOSTAS POR LINHA, ou seja, cada resposta deverá estar em uma linha diferente.
 4. O campo endereço deverá ser salvo todo na mesma linha.
 5. O arquivo somente conterá **RESPOSTAS**, PERGUNTAS NÃO!
@@ -246,9 +246,9 @@ Caso o usuário escolha a opção 2, você deverá exibir um novo menu com as se
 
 ## Considerações Finais 📝
 
-- **Siga implementando o main e fazendo commits à medida que for concluindo as funcionalidades, seguindo o padrão sempre de [Conventional commits](https://www.youtube.com/watch?v=sbK9h45Jc5o)**
+- **Siga implementando o projeto e fazendo commits à medida que for concluindo as funcionalidades, seguindo o padrão sempre de [Conventional commits](https://www.youtube.com/watch?v=sbK9h45Jc5o)**
 
-- **Crie um arquivo README.md com uma descrição do seu main e instruções de como executá-lo.**
+- **Crie um arquivo README.md com uma descrição do seu projeto e instruções de como executá-lo.**
 
-### Gostou do main?
+### Gostou do projeto?
 Se você chegou até aqui, parabéns! Você concluiu o primeiro grande desafio do guia. 🚀
