@@ -1,11 +1,7 @@
 1 - Qual o nome e sobrenome do pet?
 2 - Qual o tipo do pet (Cachorro/Gato)?
 3 - Qual o sexo do animal?
-4 - Qual endereço que ele foi encontrado? Segue os campos:
-    i. Rua
-    ii. Número da casa
-    iii. Cidade
-    Nota: Divida-os por meio de vírgula, numa única linha.
+4 - Qual endereço que ele foi encontrado? Segue os campos: Rua, Número da casa, Cidade. Nota: Divida-os por meio de vírgula, numa única linha.
 5 - Qual a idade aproximada do pet?
 6 - Qual o peso aproximado do pet?
 7 - Qual a raça do pet?
