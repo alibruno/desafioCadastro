@@ -4,10 +4,7 @@ import dominio.Menu;
 import dominio.Pet;
 import dominio.PetAtributoInvalidoExeception;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.Scanner;
 
 public class VisualizacaoFiles {
@@ -39,27 +36,6 @@ public class VisualizacaoFiles {
         }
     }
 
-    private String iterarSobreAtributosPet(int ordemAtributo, String atributoString) {
-        switch (ordemAtributo) {
-            case 0:
-                return Pet.validarNomeCompleto(atributoString);
-            case 1:
-                return Pet.validarTipo(atributoString);
-            case 2:
-                return Pet.validarSexo(atributoString);
-            case 3:
-                return Pet.validarEndereco(atributoString);
-            case 4:
-                return Pet.validarIdade(atributoString);
-            case 5:
-                return Pet.validarPeso(atributoString);
-            case 6:
-                return Pet.validarRaca(atributoString);
-            default:
-                throw new PetAtributoInvalidoExeception("Ocorreu um erro durante a iteração.");
-        }
-    }
-
     public void cadastrar() {
         try (BufferedReader br = new BufferedReader(new FileReader(FILE_FORMULARIO))) {
             String leitura;
@@ -70,7 +46,7 @@ public class VisualizacaoFiles {
                     System.out.println(leitura);
                     entrada[iteracao] = scanner.nextLine();
                     try {
-                        entrada[iteracao] = iterarSobreAtributosPet(iteracao, entrada[iteracao]);
+                        entrada[iteracao] = MENU.iterarSobreAtributosPet(iteracao, entrada[iteracao]);
                         iteracao++;
                         break;
                     } catch (PetAtributoInvalidoExeception e) {
