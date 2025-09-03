@@ -1,6 +1,7 @@
 package dominio;
 
-import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Pet {
     private String nomeCompleto;
@@ -45,26 +46,24 @@ public class Pet {
     }
 
     public static String validarTipo(String tipo) {
-        Tipo.converterStringToTipo(tipo);
-        return tipo;
+        return Tipo.converterStringToTipo(tipo).toString();
     }
 
     public static String validarSexo(String sexo) {
-        Sexo.converterStringToSexo(sexo);
-        return sexo;
+        return Sexo.converterStringToSexo(sexo).toString();
     }
 
     public static String validarEndereco(String endereco) {
-        String regexEnderecoCompleto = "([A-Za-z0-9]+( ?))+, [0-9]+, [A-Za-z]+";
+        String regexEnderecoCompleto = "([A-Za-z0-9-]+( ?))+, [0-9]+, ([A-Za-z-]+( ?))+";
         if (endereco.matches(regexEnderecoCompleto)) {
             return endereco;
         }
-        String regexEnderecoSemNumero = "([A-Za-z0-9]+( ?))+, [A-Za-z]+";
+        String regexEnderecoSemNumero = "([A-Za-z0-9-]+( ?))+, ([A-Za-z-]+( ?))+";
         if (endereco.matches(regexEnderecoSemNumero)) {
             String[] splitEndereco = endereco.split(", ");
             return splitEndereco[0] + ", " + NAO_INFORMADO + ", " + splitEndereco[1];
         }
-        if (endereco.matches("([A-Za-z0-9]+( ?))+, NÃO INFORMADO, [A-Za-z]+")) {
+        if (endereco.matches("([A-Za-z0-9-]+( ?))+, NÃO INFORMADO, ([A-Za-z-]+( ?))+")) {
             return endereco;
         }
         throw new PetAtributoInvalidoExeception("Endereço inválido. Digite: \"Rua, NúmeroDaCasa, Cidade\" ou \"Rua, Cidade\", nessa ordem.");
@@ -81,16 +80,23 @@ public class Pet {
         if (idade.isEmpty() || idade.equals(NAO_INFORMADO)) {
             return NAO_INFORMADO;
         }
-        try {
-            float idadeFloat = Float.parseFloat(idade);
-            validarIdade(idadeFloat);
-            if (idadeFloat < 1) {
-                return idade;
-            }
-            return String.valueOf((int) idadeFloat);
-        } catch (NumberFormatException e) {
+        String regexIdade = "(0\\.\\d|\\d+)(( ?(anos|ano))?)";
+        if (!idade.matches(regexIdade)) {
             throw new PetAtributoInvalidoExeception("Idade inválida.");
         }
+        Pattern pattern = Pattern.compile(regexIdade);
+        Matcher matcher = pattern.matcher(idade);
+        if (matcher.find()) {
+            String idadeSomenteNumero = matcher.group(1);
+            String idadeMedidaDeTempo = matcher.group(2);
+            float idadeFloat = Float.parseFloat(idadeSomenteNumero);
+            validarIdade(idadeFloat);
+            if (idadeFloat < 1) {
+                return idadeSomenteNumero + idadeMedidaDeTempo;
+            }
+            return ((int) idadeFloat) + idadeMedidaDeTempo;
+        }
+        throw new PetAtributoInvalidoExeception("Idade inválida.");
     }
 
     private static void validarPeso(float peso) {
@@ -104,16 +110,21 @@ public class Pet {
         if (peso.isEmpty() || peso.equals(NAO_INFORMADO)) {
             return NAO_INFORMADO;
         }
-        try {
-            validarPeso(Float.parseFloat(peso));
-            return peso;
-        } catch (NumberFormatException e) {
-            throw new PetAtributoInvalidoExeception("Peso inválida.");
+        String regexPeso = "(\\d+)( ?(g|kg))";
+        if (!peso.matches(regexPeso)) {
+            throw new PetAtributoInvalidoExeception("Idade inválida.");
         }
+        Pattern pattern = Pattern.compile(regexPeso);
+        Matcher matcher = pattern.matcher(peso);
+        if (matcher.find()) {
+            validarPeso(Float.parseFloat(matcher.group(1)));
+            return matcher.group(1) + matcher.group(2).trim();
+        }
+        throw new PetAtributoInvalidoExeception("Peso inválido.");
     }
 
     public static String validarRaca(String raca) {
-        String regexRaca = "[A-Za-z]+( [A-Za-z]+)*";
+        String regexRaca = "[A-Za-z-]+( [A-Za-z-]+)*";
         if (raca.matches(regexRaca)) {
             return raca;
         }
@@ -121,5 +132,18 @@ public class Pet {
             return NAO_INFORMADO;
         }
         throw new PetAtributoInvalidoExeception("Raça inválida.");
+    }
+
+    @Override
+    public String toString() {
+        return "Pet{" +
+                "nomeCompleto='" + nomeCompleto + '\'' +
+                ", tipo=" + tipo +
+                ", sexo=" + sexo +
+                ", endereco='" + endereco + '\'' +
+                ", idade='" + idade + '\'' +
+                ", peso='" + peso + '\'' +
+                ", raca='" + raca + '\'' +
+                '}';
     }
 }
