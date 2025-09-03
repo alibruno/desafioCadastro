@@ -55,6 +55,7 @@ public class VisualizacaoFiles {
                 }
             }
             Pet pet = new Pet(entrada);
+            MENU.cadastrarNovoPet(entrada);
         } catch (IOException e) {
             e.printStackTrace();
         }
