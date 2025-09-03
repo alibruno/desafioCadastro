@@ -80,7 +80,7 @@ public class Pet {
         if (idade.isEmpty() || idade.equals(NAO_INFORMADO)) {
             return NAO_INFORMADO;
         }
-        String regexIdade = "(0\\.\\d|\\d+)(( ?(anos|ano))?)";
+        String regexIdade = "(0\\.\\d|\\d+)( (anos|ano))";
         if (!idade.matches(regexIdade)) {
             throw new PetAtributoInvalidoExeception("Idade inválida.");
         }
