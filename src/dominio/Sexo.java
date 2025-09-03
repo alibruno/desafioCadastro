@@ -1,8 +1,14 @@
 package dominio;
 
 public enum Sexo {
-    MASCULINO,
-    FEMININO;
+    MACHO("Macho"),
+    FEMEA("Femea");
+
+    private String genero;
+
+    Sexo(String genero) {
+        this.genero = genero;
+    }
 
     public static Sexo converterStringToSexo(String sexoString) {
         for (Sexo sexo : values()) {
@@ -10,6 +16,11 @@ public enum Sexo {
                 return sexo;
             }
         }
-        throw new PetAtributoInvalidoExeception("Sexo inválido. Digite: \"MASCULINO\" ou \"FEMININO\".");
+        throw new PetAtributoInvalidoExeception("Sexo inválido. Digite: \"Macho\" ou \"Femea\".");
+    }
+
+    @Override
+    public String toString() {
+        return this.genero;
     }
 }

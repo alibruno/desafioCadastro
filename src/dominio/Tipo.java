@@ -1,8 +1,13 @@
 package dominio;
 
 public enum Tipo {
-    CACHORRO,
-    GATO;
+    CACHORRO("Cachorro"),
+    GATO("Gato");
+
+    private String nomeAnimal;
+    Tipo(String nomeAnimal) {
+        this.nomeAnimal = nomeAnimal;
+    }
 
     public static Tipo converterStringToTipo(String tipoString) {
         for (Tipo tipo : values()) {
@@ -16,5 +21,10 @@ public enum Tipo {
             tiposValidos.append("\"").append(String.valueOf(tipo)).append("\"; ");
         }
         throw new PetAtributoInvalidoExeception(tiposValidos.toString());
+    }
+
+    @Override
+    public String toString() {
+        return this.nomeAnimal;
     }
 }
