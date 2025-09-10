@@ -10,18 +10,18 @@ import java.time.format.DateTimeFormatter;
 public class Menu {
     private static final File DIRETORIO_PETS_CADASTRADOS = new File("petsCadastrados");
 
-    public int opcaoValida(int opcao) throws IllegalArgumentException {
+    public int opcaoValidaMenuInicial(int opcao) throws IllegalArgumentException {
         if (opcao <= 0) {
             throw new IllegalArgumentException("Opção inválida.");
         }
         return opcao;
     }
 
-    public int opcaoValida(String opcao) throws IllegalArgumentException {
-        return this.opcaoValida(Integer.parseInt(opcao));
+    public int opcaoValidaMenuInicial(String opcao) throws IllegalArgumentException {
+        return this.opcaoValidaMenuInicial(Integer.parseInt(opcao));
     }
 
-    public String iterarSobreAtributosPet(int ordemAtributo, String atributoString) {
+    public String iterarValidacaoDeAtributosPet(int ordemAtributo, String atributoString) {
         switch (ordemAtributo) {
             case 0:
                 return Pet.validarNomeCompleto(atributoString);

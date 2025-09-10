@@ -4,7 +4,8 @@ public enum Tipo {
     CACHORRO("Cachorro"),
     GATO("Gato");
 
-    private String nomeAnimal;
+    private final String nomeAnimal;
+
     Tipo(String nomeAnimal) {
         this.nomeAnimal = nomeAnimal;
     }
@@ -15,12 +16,15 @@ public enum Tipo {
                 return tipo;
             }
         }
+        throw new PetAtributoInvalidoExeception("Tipo inválido. Tipos possíveis de cadastrar: " + tiposDisponiveis());
+    }
+
+    public static String tiposDisponiveis() {
         StringBuilder tiposValidos = new StringBuilder();
-        tiposValidos.append("Tipo inválido. Tipos possíveis de cadastrar: ");
         for (Tipo tipo : values()) {
-            tiposValidos.append("\"").append(String.valueOf(tipo)).append("\"; ");
+            tiposValidos.append("\"").append(tipo.toString()).append("\"; ");
         }
-        throw new PetAtributoInvalidoExeception(tiposValidos.toString());
+        return tiposValidos.toString();
     }
 
     @Override
