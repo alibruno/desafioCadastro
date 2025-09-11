@@ -155,55 +155,13 @@ public class VisualizacaoFiles {
         return criteriosSelecionados;
     }
 
-
-    private int linhaReferenteAoCriterioDeBusca(String criterio) {
-        if (criterio.equals("Nome") || criterio.equals("Sobrenome") || criterio.equals("Nome e sobrenome")) {
-            return 1;
-        }
-        if (criterio.equals("Tipo")) {
-            return 2;
-        }
-        if (criterio.equals("Sexo")) {
-            return 3;
-        }
-        if (criterio.equals("Endereço")) {
-            return 4;
-        }
-        if (criterio.equals("Idade")) {
-            return 5;
-        }
-        if (criterio.equals("Peso")) {
-            return 6;
-        }
-        if (criterio.equals("Raça")) {
-            return 7;
-        }
-        throw new RuntimeException("Ocorreu um erro durante a busca");
-    }
-
-    public void lerArquivosDePetsEncontrados(int i, File file) {
-        StringBuilder sb = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            String leitura;
-            sb.append(i).append(". ");
-            while ((leitura = br.readLine()) != null) {
-                sb.append(leitura.replaceAll("\\d - ", "")).append(" - ");
-            }
-            sb.delete(sb.length() - 3, sb.length());
-            System.out.println(sb);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void buscarDadosPet() {
+    public String[] buscarPosicoesFilesPetsEncontrados() {
         String[][] criterios = selecionarCriteriosECampos();
         File[] petsCadastradosNoSistema = DIRETORIO_PETS_CADASTRADOS.listFiles();
         if (petsCadastradosNoSistema == null) {
-            System.out.println("Não há pets cadastrados no sistema.");
-            return;
+            throw new RuntimeException("Não há pets cadastrados no sistema.");
         }
-        int[][] filesDePetsEncontrados = new int[criterios.length][petsCadastradosNoSistema.length];
+        int[][] validarEncontrosPetsECriterios = new int[criterios.length][petsCadastradosNoSistema.length];
         // CRITERIO -> ARQUIVOS EXISTENTES. CASO 1: ENCONTRO. CASO 0: NÃO ENCONTRO.
         int i = 0;
         for (String[] criterio : criterios) {
@@ -211,12 +169,12 @@ public class VisualizacaoFiles {
             for (File file : petsCadastradosNoSistema) {
                 try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                     String leitura;
-                    Pattern pattern = Pattern.compile(linhaReferenteAoCriterioDeBusca(criterio[0]) + " - (.*)" + criterio[1] + "(.*)", Pattern.CASE_INSENSITIVE);
+                    Pattern pattern = Pattern.compile(MENU.linhaReferenteAoCriterioDeBusca(criterio[0]) + " - (.*)" + criterio[1] + "(.*)", Pattern.CASE_INSENSITIVE);
                     Matcher matcher;
                     while ((leitura = br.readLine()) != null) {
                         matcher = pattern.matcher(leitura);
                         if (matcher.find()) {
-                            filesDePetsEncontrados[i][j] = 1;
+                            validarEncontrosPetsECriterios[i][j] = 1;
                         }
                     }
                     j++;
@@ -226,29 +184,49 @@ public class VisualizacaoFiles {
             }
             i++;
         }
-        int ordemDeEncontroDadosPet = 1;
+        StringBuilder posicoesDoArrayPetsCadast = new StringBuilder();
         boolean animalEncontrado = false;
-        if (filesDePetsEncontrados.length == 3) {
+        if (validarEncontrosPetsECriterios.length == 3) {
             for (int l = 0; l < petsCadastradosNoSistema.length; l++) {
-                if (filesDePetsEncontrados[0][l] == 0 || filesDePetsEncontrados[1][l] == 0 || filesDePetsEncontrados[2][l] == 0) {
+                if (validarEncontrosPetsECriterios[0][l] == 0 || validarEncontrosPetsECriterios[1][l] == 0 || validarEncontrosPetsECriterios[2][l] == 0) {
                     continue;
                 }
                 animalEncontrado = true;
-                lerArquivosDePetsEncontrados(ordemDeEncontroDadosPet, petsCadastradosNoSistema[l]);
-                ordemDeEncontroDadosPet++;
+                posicoesDoArrayPetsCadast.append(l).append(",");
             }
         } else {
             for (int l = 0; l < petsCadastradosNoSistema.length; l++) {
-                if (filesDePetsEncontrados[0][l] == 0 || filesDePetsEncontrados[1][l] == 0) {
+                if (validarEncontrosPetsECriterios[0][l] == 0 || validarEncontrosPetsECriterios[1][l] == 0) {
                     continue;
                 }
                 animalEncontrado = true;
-                lerArquivosDePetsEncontrados(ordemDeEncontroDadosPet, petsCadastradosNoSistema[l]);
-                ordemDeEncontroDadosPet++;
+                posicoesDoArrayPetsCadast.append(l).append(",");
             }
         }
         if (!animalEncontrado) {
-            System.out.println("Animal com esses críterios não encontrado.");
+            throw new IllegalArgumentException("\nCritérios inválidos. Por favor, digite os critérios novamente.\n");
+        }
+        return posicoesDoArrayPetsCadast.toString().split(",");
+    }
+
+    public void buscarDadosPet() {
+        while (true) {
+            try {
+                String[] posicaoPetsEncontrados = buscarPosicoesFilesPetsEncontrados();
+                File[] petsCadastradosNoSistema = DIRETORIO_PETS_CADASTRADOS.listFiles();
+                if (petsCadastradosNoSistema == null) {
+                    throw new RuntimeException("Não há pets cadastrados no sistema.");
+                }
+                for (int i = 0; i < posicaoPetsEncontrados.length; i++) {
+                    System.out.println(MENU.lerArquivoPetFormatado((i + 1), petsCadastradosNoSistema[Integer.parseInt(posicaoPetsEncontrados[i])]));
+                }
+                break;
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            } catch (RuntimeException e) {
+                System.out.println(e.getMessage());
+                break;
+            }
         }
     }
 

@@ -1,9 +1,6 @@
 package dominio;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -76,5 +73,46 @@ public class Menu {
      */
     public void cadastrarNovoPet(String[] artributosPet) throws IOException {
         inserirDadosDoPet(criarArquivoPetCadastrado(artributosPet[0]), artributosPet);
+    }
+
+    public int linhaReferenteAoCriterioDeBusca(String criterio) {
+        if (criterio.equals("Nome") || criterio.equals("Sobrenome") || criterio.equals("Nome e sobrenome")) {
+            return 1;
+        }
+        if (criterio.equals("Tipo")) {
+            return 2;
+        }
+        if (criterio.equals("Sexo")) {
+            return 3;
+        }
+        if (criterio.equals("Endereço")) {
+            return 4;
+        }
+        if (criterio.equals("Idade")) {
+            return 5;
+        }
+        if (criterio.equals("Peso")) {
+            return 6;
+        }
+        if (criterio.equals("Raça")) {
+            return 7;
+        }
+        throw new RuntimeException("Ocorreu um erro durante a busca");
+    }
+
+    public String lerArquivoPetFormatado(int i, File file) {
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String leitura;
+            sb.append(i).append(". ");
+            while ((leitura = br.readLine()) != null) {
+                sb.append(leitura.replaceAll("\\d - ", "")).append(" - ");
+            }
+            sb.delete(sb.length() - 3, sb.length());
+            return sb.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 }
