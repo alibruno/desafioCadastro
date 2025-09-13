@@ -115,4 +115,34 @@ public class Menu {
             return "";
         }
     }
+
+    public boolean alterarFilePetExistente(int numCampo, String novoCampo, File fileASerReescrito) throws IOException {
+        File fileFinal = new File(fileASerReescrito.getPath().concat("temp"));
+        fileFinal.createNewFile();
+        try (BufferedReader br = new BufferedReader(new FileReader(fileASerReescrito));
+             BufferedWriter bw = new BufferedWriter(new FileWriter(fileFinal))) {
+            String leitura;
+            while ((leitura = br.readLine()) != null) {
+                if (leitura.matches(numCampo + " - (.+)")) {
+                    bw.write(numCampo + " - " + novoCampo);
+                    bw.newLine();
+                    bw.flush();
+                    continue;
+                }
+                bw.write(leitura);
+                bw.newLine();
+                bw.flush();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        fileASerReescrito.delete();
+        StringBuilder sb = new StringBuilder();
+        if (numCampo == 1){
+            sb.append(fileFinal.getPath(), 0, 30).append(novoCampo.toUpperCase().replace(" ", "")).append(".txt");
+            return fileFinal.renameTo(new File(sb.toString()));
+        }
+        sb.append(fileFinal.getPath(), 0, fileFinal.getPath().length() - 4);
+        return fileFinal.renameTo(new File(sb.toString()));
+    }
 }

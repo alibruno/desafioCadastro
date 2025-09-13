@@ -217,17 +217,95 @@ public class VisualizacaoFiles {
                 if (petsCadastradosNoSistema == null) {
                     throw new RuntimeException("Não há pets cadastrados no sistema.");
                 }
+                System.out.println("Pets encontrados:");
                 for (int i = 0; i < posicaoPetsEncontrados.length; i++) {
                     System.out.println(MENU.lerArquivoPetFormatado((i + 1), petsCadastradosNoSistema[Integer.parseInt(posicaoPetsEncontrados[i])]));
                 }
                 break;
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
-            } catch (RuntimeException e) {
-                System.out.println(e.getMessage());
-                break;
             }
         }
+    }
+
+    public File fileDoPetQueSeraAlterado() {
+        String[] posicaoPetsEncontrados;
+        while (true) {
+            try {
+                posicaoPetsEncontrados = buscarPosicoesFilesPetsEncontrados();
+                break;
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        File[] petsCadastradosNoSistema = DIRETORIO_PETS_CADASTRADOS.listFiles();
+        if (petsCadastradosNoSistema == null) {
+            throw new RuntimeException("Não há pets cadastrados no sistema.");
+        }
+        System.out.println("Pets encontrados:");
+        for (int i = 0; i < posicaoPetsEncontrados.length; i++) {
+            System.out.println(MENU.lerArquivoPetFormatado((i + 1), petsCadastradosNoSistema[Integer.parseInt(posicaoPetsEncontrados[i])]));
+        }
+        // posicaoPetsEncontrados = [0, 5]
+        // petsCadastradosNoSistema [0,1,2,3,4,5]
+        // petsCadastradosNoSistema [posicaoPetsEncontrados == 1 => 5] -> File 5
+        // indiceEscolhido = 2 -> File 5
+        // petsCadastradosNoSistema [posicaoPetsEncontrados(indiceEscolhido = 2 - 1) => 5] -> File 5
+
+        System.out.println("Selecione a posição dos pets em que você deseja alterar.");
+        while (true) {
+            try {
+                int indicePetEscolhido = Integer.parseInt(scanner.nextLine());
+                indicePetEscolhido -= 1;
+                if (indicePetEscolhido < 0 || indicePetEscolhido > (posicaoPetsEncontrados.length - 1)) {
+                    throw new IllegalArgumentException();
+                }
+                return petsCadastradosNoSistema[Integer.parseInt(posicaoPetsEncontrados[indicePetEscolhido])];
+            } catch (IllegalArgumentException e) {
+                System.out.println("Posição do pet inválida. Insira novamente.");
+            }
+        }
+    }
+
+    public void alterarPetCadastrado() {
+        File file = fileDoPetQueSeraAlterado();
+        System.out.println("O que você deseja alterar no pet? Selecione o campo pelo número: 1(Nome), 4(Endereço), 5(Idade), 6(Peso), 7(Raça)");
+        System.out.println("Nota: não se pode alterar \"(2)Tipo\" e \"(3)Sexo\"");
+        int criterioQueSofreraAlteracoes;
+        while (true) {
+            try {
+                criterioQueSofreraAlteracoes = Integer.parseInt(scanner.nextLine());
+                if (criterioQueSofreraAlteracoes <= 0 || criterioQueSofreraAlteracoes == 2 || criterioQueSofreraAlteracoes == 3 ||
+                        criterioQueSofreraAlteracoes > 7) {
+                    throw new IllegalArgumentException();
+                }
+                break;
+            } catch (IllegalArgumentException e) {
+                System.out.println("Número inválido. Digite de um número entre 1(Nome), 4(Endereço), 5(Idade), 6(Peso), 7(Raça)");
+                System.out.println("Nota: não se pode alterar \"2(Tipo)\" e \"3(Sexo)\"");
+            }
+        }
+        System.out.println("Digite a alteração:");
+        String campoQueSofreraAlteracoes;
+        while (true) {
+            try {
+                campoQueSofreraAlteracoes = scanner.nextLine();
+                campoQueSofreraAlteracoes = MENU.iterarValidacaoDeAtributosPet((criterioQueSofreraAlteracoes - 1), campoQueSofreraAlteracoes);
+                break;
+            } catch (PetAtributoInvalidoExeception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        try {
+            boolean foiCriado = MENU.alterarFilePetExistente(criterioQueSofreraAlteracoes, campoQueSofreraAlteracoes, file);
+            if (!foiCriado) {
+                throw new RuntimeException("Erro durante a alteração de um PetExistente. Possíveis causas: " +
+                        "\n1. Criação do arq. temporário, \n2. Delete do arq. original, \n3. Não foi possível renomear o arq. temporário");
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println("Alteração realizada com sucesso!");
     }
 
     public void iniciar() {
@@ -237,6 +315,9 @@ public class VisualizacaoFiles {
             case 1:
                 cadastrar();
                 System.out.println("\nPet criado com sucesso!");
+                break;
+            case 2:
+                alterarPetCadastrado();
                 break;
             case 5:
                 buscarDadosPet();
