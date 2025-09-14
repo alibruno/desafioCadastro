@@ -68,12 +68,10 @@ public class VisualizacaoFiles {
 
     private String selecionarTipo() {
         System.out.println("\nPrimeiramente, selecione o TIPO de animal que deseja buscar.");
-        System.out.print("Tipos disponíveis: " + Tipo.tiposDisponiveis() + "\n");
-        String tipoEscolhido;
+        System.out.println("Tipos disponíveis: " + Tipo.tiposDisponiveis());
         while (true) {
             try {
-                tipoEscolhido = scanner.nextLine();
-                return Tipo.converterStringToTipo(tipoEscolhido).toString();
+                return Tipo.converterStringToTipo(scanner.nextLine()).toString();
             } catch (PetAtributoInvalidoExeception e) {
                 System.out.println(e.getMessage());
             }
@@ -87,11 +85,11 @@ public class VisualizacaoFiles {
             try {
                 quantCriteriosInt = Integer.parseInt(scanner.nextLine());
                 if (quantCriteriosInt != 1 && quantCriteriosInt != 2) {
-                    throw new IllegalArgumentException("Quantidade inválida. São permitidas apenas a escolha de 1 ou 2 critérios.");
+                    throw new IllegalArgumentException();
                 }
                 break;
             } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
+                System.out.println("Quantia ou entrada inválida. São permitidas apenas a escolha de 1 ou 2 critérios.");
             }
         }
         return quantCriteriosInt;
@@ -100,9 +98,9 @@ public class VisualizacaoFiles {
     private String[][] selecionarCriteriosECampos() {
         String tipoSelecionado = selecionarTipo();
         int quantCriterios = definirQuantidadeDeCriterios();
-        String[][] criteriosSelecionados = new String[quantCriterios + 1][2];
-        criteriosSelecionados[0][0] = "Tipo";
-        criteriosSelecionados[0][1] = tipoSelecionado;
+        String[][] criteriosECamposSelecionados = new String[quantCriterios + 1][2];
+        criteriosECamposSelecionados[0][0] = "Tipo";
+        criteriosECamposSelecionados[0][1] = tipoSelecionado;
 
         System.out.println("\n          MENU DE BUSCA:\n" +
                 "> Nome ou sobrenome\n" +
@@ -112,24 +110,14 @@ public class VisualizacaoFiles {
                 "> Raça\n" +
                 "> Endereço\n");
 
-        String[] palavrasChavesCriterio = {"Nome", "Sobrenome", "Nome e sobrenome", "Sexo", "Idade", "Peso", "Raça", "Endereço"};
-        for (int i = 1; i < criteriosSelecionados.length; i++) {
+        for (int i = 1; i < criteriosECamposSelecionados.length; i++) {
             System.out.println("Digite o critério " + (i) + ": ");
             while (true) {
                 try {
                     String criterioInserido = scanner.nextLine();
-                    for (String criterioValido : palavrasChavesCriterio) {
-                        if (criterioInserido.equalsIgnoreCase(criterioValido)) {
-                            criteriosSelecionados[i][0] = criterioValido;
-                            break;
-                        }
-                    }
-                    if (criteriosSelecionados[i][0] == null) {
-                        throw new IllegalArgumentException("Critério inválido. Insira uma das seguintes palavras: " +
-                                Arrays.toString(palavrasChavesCriterio));
-                    }
-                    if (i == 2 && criteriosSelecionados[i][0].equals(criteriosSelecionados[i - 1][0])) {
-                        criteriosSelecionados[i][0] = null;
+                    criteriosECamposSelecionados[i][0] = MENU.validarCriterioInseridoParaBuscaDePets(i, criterioInserido);
+                    if (i == 2 && criteriosECamposSelecionados[i][0].equals(criteriosECamposSelecionados[i - 1][0])) {
+                        criteriosECamposSelecionados[i][0] = null;
                         throw new IllegalArgumentException("Critério já selecionado. Por favor, selecione outro critério.");
                     }
                     break;
@@ -138,24 +126,20 @@ public class VisualizacaoFiles {
                 }
             }
             System.out.println("Insira o que deve ser buscado: ");
-            String campoASerBuscado;
             while (true) {
                 try {
-                    campoASerBuscado = scanner.nextLine();
-                    if (criteriosSelecionados[i][0].equals("Sexo") && !(campoASerBuscado.equalsIgnoreCase("Macho") || campoASerBuscado.equalsIgnoreCase("Femea"))) {
-                        throw new IllegalArgumentException("Campo inválido. Digite: Macho ou Femea.");
-                    }
+                    String campoASerBuscado = scanner.nextLine();
+                    criteriosECamposSelecionados[i][1] = MENU.validarCampoInseridoParaBuscaDePets(criteriosECamposSelecionados[i][0], campoASerBuscado);
                     break;
                 } catch (IllegalArgumentException e) {
                     System.out.println(e.getMessage());
                 }
             }
-            criteriosSelecionados[i][1] = campoASerBuscado;
         }
-        return criteriosSelecionados;
+        return criteriosECamposSelecionados;
     }
 
-    public String[] buscarPosicoesFilesPetsEncontrados() {
+    public String[] buscarPosicoesFilesPetsComDeterminadosCriteriosECampos() {
         String[][] criterios = selecionarCriteriosECampos();
         File[] petsCadastradosNoSistema = DIRETORIO_PETS_CADASTRADOS.listFiles();
         if (petsCadastradosNoSistema == null) {
@@ -213,7 +197,7 @@ public class VisualizacaoFiles {
         String[] posicaoPetsEncontrados;
         while (true) {
             try {
-                posicaoPetsEncontrados = buscarPosicoesFilesPetsEncontrados();
+                posicaoPetsEncontrados = buscarPosicoesFilesPetsComDeterminadosCriteriosECampos();
                 break;
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
@@ -238,7 +222,7 @@ public class VisualizacaoFiles {
         String[] posicaoPetsEncontrados;
         while (true) {
             try {
-                posicaoPetsEncontrados = buscarPosicoesFilesPetsEncontrados();
+                posicaoPetsEncontrados = buscarPosicoesFilesPetsComDeterminadosCriteriosECampos();
                 break;
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
@@ -284,21 +268,21 @@ public class VisualizacaoFiles {
             System.out.println("Pet não alterado.");
             return;
         }
-        System.out.println("\nO que você deseja alterar no pet? Selecione o campo pelo número: 1(Nome), 4(Endereço), 5(Idade), 6(Peso), 7(Raça)");
-        System.out.println("Nota: não se pode alterar \"(2)Tipo\" e \"(3)Sexo\"");
+        System.out.println("\nO que você deseja alterar no pet? Selecione o campo pelo número: 1(Nome), 2(Endereço), 3(Idade), 4(Peso), 5(Raça)");
         int criterioQueSofreraAlteracoes;
         while (true) {
             try {
                 criterioQueSofreraAlteracoes = Integer.parseInt(scanner.nextLine());
-                if (criterioQueSofreraAlteracoes <= 0 || criterioQueSofreraAlteracoes == 2 || criterioQueSofreraAlteracoes == 3 ||
-                        criterioQueSofreraAlteracoes > 7) {
+                if (criterioQueSofreraAlteracoes < 1 || criterioQueSofreraAlteracoes > 5) {
                     throw new IllegalArgumentException();
                 }
                 break;
             } catch (IllegalArgumentException e) {
-                System.out.println("Número inválido. Digite de um número entre 1(Nome), 4(Endereço), 5(Idade), 6(Peso), 7(Raça)");
-                System.out.println("Nota: não se pode alterar \"2(Tipo)\" e \"3(Sexo)\"");
+                System.out.println("Número inválido. Digite de um número entre 1(Nome), 2(Endereço), 3(Idade), 4(Peso), 5(Raça)");
             }
+        }
+        if (criterioQueSofreraAlteracoes != 1) {
+            criterioQueSofreraAlteracoes += 2;
         }
         System.out.println("Digite a alteração:");
         String campoQueSofreraAlteracoes;
@@ -320,7 +304,7 @@ public class VisualizacaoFiles {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        System.out.println("Alteração realizada com sucesso!");
+        System.out.println("\nAlteração realizada com sucesso!");
     }
 
     public void deletarPetCadastrado() {

@@ -3,6 +3,7 @@ package dominio;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 
 public class Menu {
     private static final File DIRETORIO_PETS_CADASTRADOS = new File("petsCadastrados");
@@ -75,6 +76,35 @@ public class Menu {
         inserirDadosDoPet(criarArquivoPetCadastrado(artributosPet[0]), artributosPet);
     }
 
+    public String validarCriterioInseridoParaBuscaDePets(int i, String campo) {
+        String[] palavrasChavesCriterio = {"Nome", "Sobrenome", "Nome e sobrenome", "Sexo", "Idade", "Peso", "Raça", "Endereço"};
+        for (String criterioValido : palavrasChavesCriterio) {
+            if (campo.equalsIgnoreCase(criterioValido)) {
+                return criterioValido;
+            }
+        }
+        throw new IllegalArgumentException("Critério inválido. Insira uma das seguintes palavras: " + Arrays.toString(palavrasChavesCriterio));
+    }
+
+    public String validarCampoInseridoParaBuscaDePets(String criterio, String campo) {
+        if (criterio.equals("Sexo") && !(campo.equalsIgnoreCase("Macho") || campo.equalsIgnoreCase("Femea"))) {
+            throw new IllegalArgumentException("Campo inválido. Digite: Macho ou Femea.");
+        }
+        if (criterio.equals("Idade")) {
+            if (!campo.matches("(0\\.\\d|0,\\d|\\d+)( (anos|ano))")) {
+                throw new IllegalArgumentException("Campo inválido. Digite uma idade válida.");
+            }
+            if (campo.matches("0,\\d")) {
+                String[] split = campo.split(",");
+                return "0." + split[1];
+            }
+        }
+        if (criterio.equals("Peso") && !campo.matches("(\\d+)(kg)")) {
+            throw new IllegalArgumentException("Campo inválido. Digite um peso válido.");
+        }
+        return campo;
+    }
+
     public int linhaReferenteAoCriterioDeBusca(String criterio) {
         if (criterio.equals("Nome") || criterio.equals("Sobrenome") || criterio.equals("Nome e sobrenome")) {
             return 1;
@@ -125,11 +155,9 @@ public class Menu {
             while ((leitura = br.readLine()) != null) {
                 if (leitura.matches(numCampo + " - (.+)")) {
                     bw.write(numCampo + " - " + novoCampo);
-                    bw.newLine();
-                    bw.flush();
-                    continue;
+                } else {
+                    bw.write(leitura);
                 }
-                bw.write(leitura);
                 bw.newLine();
                 bw.flush();
             }
@@ -138,7 +166,7 @@ public class Menu {
         }
         fileASerReescrito.delete();
         StringBuilder sb = new StringBuilder();
-        if (numCampo == 1){
+        if (numCampo == 1) {
             sb.append(fileFinal.getPath(), 0, 30).append(novoCampo.toUpperCase().replace(" ", "")).append(".txt");
             return fileFinal.renameTo(new File(sb.toString()));
         }
@@ -146,9 +174,9 @@ public class Menu {
         return fileFinal.renameTo(new File(sb.toString()));
     }
 
-    public void deletarPetCadastrado(File file){
+    public void deletarPetCadastrado(File file) {
         boolean foiDeletado = file.delete();
-        if (!foiDeletado){
+        if (!foiDeletado) {
             throw new RuntimeException("Erro: pet não foi deletado.");
         }
     }

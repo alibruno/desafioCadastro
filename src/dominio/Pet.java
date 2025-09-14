@@ -80,21 +80,26 @@ public class Pet {
         if (idade.isEmpty() || idade.equals(NAO_INFORMADO)) {
             return NAO_INFORMADO;
         }
-        String regexIdade = "(0\\.\\d|\\d+)( (anos|ano))";
+        String regexIdade = "(0\\.\\d|0,\\d|\\d+)( (anos|ano))";
         if (!idade.matches(regexIdade)) {
             throw new PetAtributoInvalidoExeception("Idade inválida.");
         }
         Pattern pattern = Pattern.compile(regexIdade);
         Matcher matcher = pattern.matcher(idade);
         if (matcher.find()) {
-            String idadeSomenteNumero = matcher.group(1);
-            String idadeMedidaDeTempo = matcher.group(2);
+            String idadeSomenteNumero;
+            if (matcher.group(1).matches("0,\\d")) {
+                String[] split = matcher.group(1).split(",");
+                idadeSomenteNumero = "0." + split[1];
+            } else {
+                idadeSomenteNumero = matcher.group(1);
+            }
             float idadeFloat = Float.parseFloat(idadeSomenteNumero);
             validarIdade(idadeFloat);
             if (idadeFloat < 1) {
-                return idadeSomenteNumero + idadeMedidaDeTempo;
+                return idadeSomenteNumero + matcher.group(2);
             }
-            return ((int) idadeFloat) + idadeMedidaDeTempo;
+            return ((int) idadeFloat) + matcher.group(2);
         }
         throw new PetAtributoInvalidoExeception("Idade inválida.");
     }
@@ -110,9 +115,9 @@ public class Pet {
         if (peso.isEmpty() || peso.equals(NAO_INFORMADO)) {
             return NAO_INFORMADO;
         }
-        String regexPeso = "(\\d+)( ?(g|kg))";
+        String regexPeso = "(\\d+)(kg)";
         if (!peso.matches(regexPeso)) {
-            throw new PetAtributoInvalidoExeception("Idade inválida.");
+            throw new PetAtributoInvalidoExeception("Peso inválido.");
         }
         Pattern pattern = Pattern.compile(regexPeso);
         Matcher matcher = pattern.matcher(peso);
