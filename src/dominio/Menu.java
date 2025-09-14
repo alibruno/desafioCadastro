@@ -145,4 +145,11 @@ public class Menu {
         sb.append(fileFinal.getPath(), 0, fileFinal.getPath().length() - 4);
         return fileFinal.renameTo(new File(sb.toString()));
     }
+
+    public void deletarPetCadastrado(File file){
+        boolean foiDeletado = file.delete();
+        if (!foiDeletado){
+            throw new RuntimeException("Erro: pet não foi deletado.");
+        }
+    }
 }

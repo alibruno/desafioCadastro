@@ -67,7 +67,7 @@ public class VisualizacaoFiles {
     }
 
     private String selecionarTipo() {
-        System.out.println("Primeiramente, selecione o TIPO de animal que deseja buscar.");
+        System.out.println("\nPrimeiramente, selecione o TIPO de animal que deseja buscar.");
         System.out.print("Tipos disponíveis: " + Tipo.tiposDisponiveis() + "\n");
         String tipoEscolhido;
         while (true) {
@@ -104,13 +104,13 @@ public class VisualizacaoFiles {
         criteriosSelecionados[0][0] = "Tipo";
         criteriosSelecionados[0][1] = tipoSelecionado;
 
-        System.out.println("Menu de busca: \n" +
-                "    Nome ou sobrenome\n" +
-                "    Sexo (Digite: Macho ou Femea)\n" +
-                "    Idade\n" +
-                "    Peso\n" +
-                "    Raça\n" +
-                "    Endereço\n");
+        System.out.println("\n          MENU DE BUSCA:\n" +
+                "> Nome ou sobrenome\n" +
+                "> Sexo (Digite: Macho ou Femea)\n" +
+                "> Idade\n" +
+                "> Peso\n" +
+                "> Raça\n" +
+                "> Endereço\n");
 
         String[] palavrasChavesCriterio = {"Nome", "Sobrenome", "Nome e sobrenome", "Sexo", "Idade", "Peso", "Raça", "Endereço"};
         for (int i = 1; i < criteriosSelecionados.length; i++) {
@@ -204,31 +204,12 @@ public class VisualizacaoFiles {
             }
         }
         if (!animalEncontrado) {
-            throw new IllegalArgumentException("\nCritérios inválidos. Por favor, digite os critérios novamente.\n");
+            throw new IllegalArgumentException("\nCritérios inválidos / Pet inexistente.\n");
         }
         return posicoesDoArrayPetsCadast.toString().split(",");
     }
 
     public void buscarDadosPet() {
-        while (true) {
-            try {
-                String[] posicaoPetsEncontrados = buscarPosicoesFilesPetsEncontrados();
-                File[] petsCadastradosNoSistema = DIRETORIO_PETS_CADASTRADOS.listFiles();
-                if (petsCadastradosNoSistema == null) {
-                    throw new RuntimeException("Não há pets cadastrados no sistema.");
-                }
-                System.out.println("Pets encontrados:");
-                for (int i = 0; i < posicaoPetsEncontrados.length; i++) {
-                    System.out.println(MENU.lerArquivoPetFormatado((i + 1), petsCadastradosNoSistema[Integer.parseInt(posicaoPetsEncontrados[i])]));
-                }
-                break;
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-            }
-        }
-    }
-
-    public File fileDoPetQueSeraAlterado() {
         String[] posicaoPetsEncontrados;
         while (true) {
             try {
@@ -236,6 +217,36 @@ public class VisualizacaoFiles {
                 break;
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
+                System.out.println("Deseja inserir os critérios novamente? Digite: \"SIM\" ou \"NÃO\".");
+                String escolha = scanner.nextLine();
+                if (!escolha.equalsIgnoreCase("SIM")) {
+                    return;
+                }
+            }
+        }
+        File[] petsCadastradosNoSistema = DIRETORIO_PETS_CADASTRADOS.listFiles();
+        if (petsCadastradosNoSistema == null) {
+            throw new RuntimeException("Não há pets cadastrados no sistema.");
+        }
+        System.out.println("\nPets encontrados:");
+        for (int i = 0; i < posicaoPetsEncontrados.length; i++) {
+            System.out.println(MENU.lerArquivoPetFormatado((i + 1), petsCadastradosNoSistema[Integer.parseInt(posicaoPetsEncontrados[i])]));
+        }
+    }
+
+    public File fileDoPetQueSeraAlteradoOuDeletado() {
+        String[] posicaoPetsEncontrados;
+        while (true) {
+            try {
+                posicaoPetsEncontrados = buscarPosicoesFilesPetsEncontrados();
+                break;
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+                System.out.println("Deseja inserir os critérios novamente? Digite: \"SIM\" ou \"NÃO\".");
+                String escolha = scanner.nextLine();
+                if (!escolha.equalsIgnoreCase("SIM")) {
+                    return null;
+                }
             }
         }
         File[] petsCadastradosNoSistema = DIRETORIO_PETS_CADASTRADOS.listFiles();
@@ -268,8 +279,12 @@ public class VisualizacaoFiles {
     }
 
     public void alterarPetCadastrado() {
-        File file = fileDoPetQueSeraAlterado();
-        System.out.println("O que você deseja alterar no pet? Selecione o campo pelo número: 1(Nome), 4(Endereço), 5(Idade), 6(Peso), 7(Raça)");
+        File file = fileDoPetQueSeraAlteradoOuDeletado();
+        if (file == null) {
+            System.out.println("Pet não alterado.");
+            return;
+        }
+        System.out.println("\nO que você deseja alterar no pet? Selecione o campo pelo número: 1(Nome), 4(Endereço), 5(Idade), 6(Peso), 7(Raça)");
         System.out.println("Nota: não se pode alterar \"(2)Tipo\" e \"(3)Sexo\"");
         int criterioQueSofreraAlteracoes;
         while (true) {
@@ -308,20 +323,62 @@ public class VisualizacaoFiles {
         System.out.println("Alteração realizada com sucesso!");
     }
 
+    public void deletarPetCadastrado() {
+        File file = fileDoPetQueSeraAlteradoOuDeletado();
+        if (file == null) {
+            System.out.println("Nenhum pet foi deletado.");
+            return;
+        }
+        System.out.println("Você realmente deseja apagar esse pet? Digite:\"SIM\" ou \"NÃO\"");
+        String escolha = scanner.nextLine();
+        if (escolha.equalsIgnoreCase("SIM")) {
+            MENU.deletarPetCadastrado(file);
+            return;
+        }
+        System.out.println("Nenhum pet foi deletado.");
+    }
+
+    public void listarTodosOsPetsCadastrados() {
+        File[] petsCadastradosNoSistema = DIRETORIO_PETS_CADASTRADOS.listFiles();
+        if (petsCadastradosNoSistema == null) {
+            throw new RuntimeException("Não há pets cadastrados no sistema.");
+        }
+        System.out.println("Pets encontrados:");
+        for (int i = 0; i < petsCadastradosNoSistema.length; i++) {
+            System.out.println(MENU.lerArquivoPetFormatado((i + 1), petsCadastradosNoSistema[i]));
+        }
+    }
+
     public void iniciar() {
         leituraFile(FILE_MENU_INICIAL);
         int opcao = escolherOpcaoMenuInicial();
-        switch (opcao) {
-            case 1:
-                cadastrar();
-                System.out.println("\nPet criado com sucesso!");
-                break;
-            case 2:
-                alterarPetCadastrado();
-                break;
-            case 5:
-                buscarDadosPet();
-                break;
+        try {
+            switch (opcao) {
+                case 1:
+                    cadastrar();
+                    System.out.println("\nPet criado com sucesso!");
+                    break;
+                case 2:
+                    alterarPetCadastrado();
+                    break;
+                case 3:
+                    deletarPetCadastrado();
+                    break;
+                case 4:
+                    listarTodosOsPetsCadastrados();
+                    break;
+                case 5:
+                    buscarDadosPet();
+                    break;
+                case 6:
+                    System.out.println("Programa encerrado.");
+                    break;
+                default:
+                    System.out.println("Opção inválida.");
+            }
+        } catch (RuntimeException e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 }
